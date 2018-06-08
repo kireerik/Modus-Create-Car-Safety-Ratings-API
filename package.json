@@ -1,0 +1,15 @@
+{
+	"scripts": {
+		"start": "micro --listen tcp://127.0.0.1:8888"
+		, "dev": "micro-dev --port 80"
+	}
+	, "dependencies": {
+		"micro": "9.x"
+		, "microrouter": "3.x"
+
+		, "node-fetch": "2.x"
+	}
+	, "devDependencies": {
+		"micro-dev": "3.x"
+	}
+}
