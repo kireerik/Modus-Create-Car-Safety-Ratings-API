@@ -26,7 +26,7 @@ const {json} = require('micro')
 		await getVehicles(modelYear, manufacturer, model)
 	)
 
-	if (query.withRating)
+	if (query.withRating == 'true')
 		result = getVehiclesWithRating(result)
 
 	return result
