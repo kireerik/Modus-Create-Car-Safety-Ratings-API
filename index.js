@@ -12,6 +12,10 @@ const {json} = require('micro')
 		, VehicleId: vehicle.VehicleId
 	}))
 })
+, getFilteredVehicles = async (modelYear, manufacturer, model) =>
+	filterVehicles(
+		await getVehicles(modelYear, manufacturer, model)
+	)
 
 module.exports = router(
 	// examples:
@@ -19,15 +23,11 @@ module.exports = router(
 	// http://localhost/vehicles/2015/Toyota/Yaris
 	// http://localhost/vehicles/2013/Ford/Crown Victoria
 	get('/vehicles/:modelYear/:manufacturer/*:model', async request =>
-		filterVehicles(
-			await getVehicles(request.params.modelYear, request.params.manufacturer, request.params.model)
-		)
+		getFilteredVehicles(request.params.modelYear, request.params.manufacturer, request.params.model)
 	)
 	, post('/vehicles', async request => {
 		const {modelYear, manufacturer, model} = await json(request)
 
-		return filterVehicles(
-			await getVehicles(modelYear, manufacturer, model)
-		)
+		return getFilteredVehicles(modelYear, manufacturer, model)
 	})
 )
