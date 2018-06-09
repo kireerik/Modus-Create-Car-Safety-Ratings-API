@@ -3,8 +3,16 @@ const {json} = require('micro')
 
 , fetch = require('node-fetch')
 
-, getVehicles = async (modelYear, manufacturer, model) =>
-	(await fetch('https://one.nhtsa.gov/webapi/api/SafetyRatings/modelyear/' + modelYear + '/make/' + manufacturer + '/model/' + model + '?format=json')).json()
+, getVehicles = async (modelYear, manufacturer, model) => {
+	try {
+		return await (await fetch('https://one.nhtsa.gov/webapi/api/SafetyRatings/modelyear/' + modelYear + '/make/' + manufacturer + '/model/' + model + '?format=json')).json()
+	} catch (error) {
+		return {
+			Count: 0
+			, Results: []
+		}
+	}
+}
 , filterVehicles = vehicles => ({
 	Count: vehicles.Count
 	, Results: vehicles.Results.map(vehicle => ({
