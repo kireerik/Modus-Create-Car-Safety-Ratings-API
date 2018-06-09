@@ -7,8 +7,15 @@ module.exports = router(
 	// http://localhost/vehicles/2015/Audi/A3
 	// http://localhost/vehicles/2015/Toyota/Yaris
 	// http://localhost/vehicles/2013/Ford/Crown Victoria
-	get('/vehicles/:modelYear/:manufacturer/*:model', async request =>
-		(await fetch('https://one.nhtsa.gov/webapi/api/SafetyRatings/modelyear/' + request.params.modelYear + '/make/' + request.params.manufacturer + '/model/' + request.params.model
-		 + '?format=json')).json()
-	)
+	get('/vehicles/:modelYear/:manufacturer/*:model', async request => {
+		const result = await (await fetch('https://one.nhtsa.gov/webapi/api/SafetyRatings/modelyear/' + request.params.modelYear + '/make/' + request.params.manufacturer + '/model/' + request.params.model + '?format=json')).json()
+
+		return {
+			Count: result.Count
+			, Results: result.Results.map(vehicle => ({
+				Description: vehicle.VehicleDescription
+				, VehicleId: vehicle.VehicleId
+			}))
+		}
+	})
 )
