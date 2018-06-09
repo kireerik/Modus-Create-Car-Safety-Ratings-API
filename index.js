@@ -12,10 +12,25 @@ const {json} = require('micro')
 		, VehicleId: vehicle.VehicleId
 	}))
 })
-, getFilteredVehicles = async (modelYear, manufacturer, model) =>
-	filterVehicles(
+, getVehiclesWithRating = async vehicles => {
+	vehicles.Results = await Promise.all(vehicles.Results.map(async vehicle => {
+		vehicle.CrashRating = (await (await fetch('https://one.nhtsa.gov/webapi/api/SafetyRatings/VehicleId/' + vehicle.VehicleId + '?format=json')).json()).Results[0].OverallRating
+
+		return vehicle
+	}))
+
+	return vehicles
+}
+, getFilteredVehicles = async (modelYear, manufacturer, model, query) => {
+	var result = filterVehicles(
 		await getVehicles(modelYear, manufacturer, model)
 	)
+
+	if (query.withRating)
+		result = getVehiclesWithRating(result)
+
+	return result
+}
 
 module.exports = router(
 	// examples:
@@ -23,11 +38,11 @@ module.exports = router(
 	// http://localhost/vehicles/2015/Toyota/Yaris
 	// http://localhost/vehicles/2013/Ford/Crown Victoria
 	get('/vehicles/:modelYear/:manufacturer/*:model', async request =>
-		getFilteredVehicles(request.params.modelYear, request.params.manufacturer, request.params.model)
+		getFilteredVehicles(request.params.modelYear, request.params.manufacturer, request.params.model, request.query)
 	)
 	, post('/vehicles', async request => {
 		const {modelYear, manufacturer, model} = await json(request)
 
-		return getFilteredVehicles(modelYear, manufacturer, model)
+		return getFilteredVehicles(modelYear, manufacturer, model, request.query)
 	})
 )
