@@ -13,11 +13,11 @@ const {json} = require('micro')
 	}))
 })
 , getVehiclesWithRating = async vehicles => {
-	vehicles.Results = await Promise.all(vehicles.Results.map(async vehicle => {
-		vehicle.CrashRating = (await (await fetch('https://one.nhtsa.gov/webapi/api/SafetyRatings/VehicleId/' + vehicle.VehicleId + '?format=json')).json()).Results[0].OverallRating
-
-		return vehicle
-	}))
+	vehicles.Results = await Promise.all(vehicles.Results.map(async vehicle =>
+		Object.assign({
+			CrashRating: (await (await fetch('https://one.nhtsa.gov/webapi/api/SafetyRatings/VehicleId/' + vehicle.VehicleId + '?format=json')).json()).Results[0].OverallRating
+		}, vehicle)
+	))
 
 	return vehicles
 }
